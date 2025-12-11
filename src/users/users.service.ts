@@ -1,35 +1,22 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdateUserDTO } from './dto/update-user.dto';
+import { UsersRepository } from './users.repository';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class UsersService {
     constructor(
-        @InjectRepository(User)
-        private readonly userRepository: Repository<User>,
+        private readonly usersRepository: UsersRepository,
     ) {}
 
     async getAllUsers(limit?: number, offset?: number): Promise<User[]> {
-        const query = this.userRepository.createQueryBuilder('user');
-        
-        if (limit) {
-            query.take(limit);
-        }
-        
-        if (offset) {
-            query.skip(offset);
-        }
-        
-        return await query.getMany();
+        return this.usersRepository.findAll(limit, offset);
     }
 
     async findOneUser(id: string): Promise<User> {
-        const user = await this.userRepository.findOne({
-            where: { id }
-        });
+        const user = this.usersRepository.findById(id);
         
         if (!user) {
             throw new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND);
@@ -39,43 +26,52 @@ export class UsersService {
     }
 
     async createUser(createUserDTO: CreateUserDTO): Promise<User> {
-        const existingUser = await this.userRepository.findOne({
-            where: { email: createUserDTO.email }
-        });
+        const existingUser = this.usersRepository.findByEmail(createUserDTO.email);
         
         if (existingUser) {
             throw new HttpException('Email já cadastrado', HttpStatus.CONFLICT);
         }
         
-        const newUser = this.userRepository.create({
-            ...createUserDTO,
+        const now = new Date();
+        const newUser: User = {
+            id: randomUUID(),
+            name: createUserDTO.name,
+            email: createUserDTO.email,
             active: true,
-        });
+            createdAt: now,
+            updatedAt: now,
+        };
         
-        return await this.userRepository.save(newUser);
+        return this.usersRepository.create(newUser);
     }
 
     async updateUser(id: string, updateUserDTO: UpdateUserDTO): Promise<User> {
         const user = await this.findOneUser(id);
         
         if (updateUserDTO.email && updateUserDTO.email !== user.email) {
-            const existingUser = await this.userRepository.findOne({
-                where: { email: updateUserDTO.email }
-            });
+            const existingUser = this.usersRepository.findByEmail(updateUserDTO.email);
             
             if (existingUser) {
                 throw new HttpException('Email já cadastrado', HttpStatus.CONFLICT);
             }
         }
         
-        Object.assign(user, updateUserDTO);
-        return await this.userRepository.save(user);
+        const updatedUser: User = {
+            ...user,
+            ...updateUserDTO,
+            updatedAt: new Date(),
+        };
+        
+        return this.usersRepository.update(id, updatedUser);
     }
 
     async deleteUser(id: string): Promise<{ message: string }> {
         const user = await this.findOneUser(id);
+        if (!user) {
+            throw new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND);
+        }
         
-        await this.userRepository.remove(user);
+        this.usersRepository.delete(id);
         
         return { message: 'Usuário deletado com sucesso' };
     }
