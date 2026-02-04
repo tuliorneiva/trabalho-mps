@@ -39,12 +39,20 @@ export class UsersService {
     }
 
     async createUser(createUserDTO: CreateUserDTO): Promise<User> {
-        const existingUser = await this.userRepository.findOne({
+        const existingUserByEmail = await this.userRepository.findOne({
             where: { email: createUserDTO.email }
         });
         
-        if (existingUser) {
+        if (existingUserByEmail) {
             throw new HttpException('Email já cadastrado', HttpStatus.CONFLICT);
+        }
+
+        const existingUserByLogin = await this.userRepository.findOne({
+            where: { login: createUserDTO.login }
+        });
+        
+        if (existingUserByLogin) {
+            throw new HttpException('Login já cadastrado', HttpStatus.CONFLICT);
         }
         
         const newUser = this.userRepository.create({
