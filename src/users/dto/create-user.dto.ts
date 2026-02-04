@@ -6,7 +6,7 @@ export class CreateUserDTO {
     @IsString()
     @MaxLength(12)
     @Matches(/^[a-zA-Z]+$/, {
-        message: 'O login deve conter apenas letras (sem números)',
+        message: 'The login must contain only letters (no numbers)',
     })
     readonly login: string;
 
@@ -26,10 +26,10 @@ export class CreateUserDTO {
         minNumbers: 1,
         minSymbols: 1,
     }, {
-        message: 'A senha deve conter no mínimo 8 caracteres, incluindo pelo menos uma letra maiúscula, uma minúscula, um número e um caractere especial',
+        message: 'The password must contain at least 8 characters, including at least one uppercase letter, one lowercase letter, one number and one special character',
     })
     @PasswordNotContainsLogin({
-        message: 'A senha não pode conter o login do usuário',
+        message: 'The password cannot contain the user login',
     })
     readonly password: string;
 }

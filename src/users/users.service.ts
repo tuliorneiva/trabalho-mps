@@ -32,7 +32,7 @@ export class UsersService {
         });
         
         if (!user) {
-            throw new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND);
+            throw new HttpException('User not found', HttpStatus.NOT_FOUND);
         }
         
         return user;
@@ -44,7 +44,7 @@ export class UsersService {
         });
         
         if (existingUserByEmail) {
-            throw new HttpException('Email já cadastrado', HttpStatus.CONFLICT);
+            throw new HttpException('Email already registered', HttpStatus.CONFLICT);
         }
 
         const existingUserByLogin = await this.userRepository.findOne({
@@ -52,7 +52,7 @@ export class UsersService {
         });
         
         if (existingUserByLogin) {
-            throw new HttpException('Login já cadastrado', HttpStatus.CONFLICT);
+            throw new HttpException('Login already registered', HttpStatus.CONFLICT);
         }
         
         const newUser = this.userRepository.create({
@@ -72,7 +72,7 @@ export class UsersService {
             });
             
             if (existingUser) {
-                throw new HttpException('Email já cadastrado', HttpStatus.CONFLICT);
+                throw new HttpException('Email already registered', HttpStatus.CONFLICT);
             }
         }
         
@@ -85,6 +85,6 @@ export class UsersService {
         
         await this.userRepository.remove(user);
         
-        return { message: 'Usuário deletado com sucesso' };
+        return { message: 'User deleted successfully' };
     }
 }
