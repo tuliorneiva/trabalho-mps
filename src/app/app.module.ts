@@ -18,7 +18,13 @@ import { UsersModule } from '../users/users.module';
       password: process.env.DB_PASSWORD || '',
       database: process.env.DB_DATABASE || '',
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-      synchronize: true,
+      synchronize: process.env.NODE_ENV !== 'production',
+      ssl: process.env.DB_SSL === 'true' ? {
+        rejectUnauthorized: false,
+      } : false,
+      extra: {
+        options: '-c search_path=public',
+      },
     }),
     UsersModule,
   ],
