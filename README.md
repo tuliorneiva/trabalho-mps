@@ -6,8 +6,9 @@ Trabalho desenvolvido para a disciplina de Métodos de Projeto de Software do cu
 
 - Node.js
 - NestJS
+- TypeORM
+- PostgreSQL
 - TypeScript
-- Armazenamento em memória (Map/HashMap)
 
 ## Estrutura do Projeto
 
@@ -26,12 +27,14 @@ O projeto consiste em uma API REST para gerenciamento de usuários com as seguin
 npm install
 ```
 
-2. Executar o projeto:
+2. Configurar variáveis de ambiente no arquivo `.env`:
+ 
+3. Iniciar o servidor PostgreSQL
+
+4. Executar o projeto:
 ```bash
 npm run start:dev
 ```
-
-**Nota:** Os dados são armazenados em memória (RAM) usando estruturas Map. Os dados serão perdidos quando o servidor for reiniciado.
 
 ## Endpoints da API
 
@@ -40,3 +43,4 @@ npm run start:dev
 - `POST /users` - Cria um novo usuário
 - `PUT /users/:id` - Atualiza um usuário
 - `DELETE /users/:id` - Deleta um usuário
+
