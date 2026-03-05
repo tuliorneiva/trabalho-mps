@@ -32,7 +32,11 @@ npm install
    ```bash
    cp .env.example .env
    ```
-   - O arquivo `.env` já contém as configurações padrão para o Docker
+   - No `.env`, defina a senha do banco. **Para desenvolvimento local**, use:
+   ```env
+   DB_PASSWORD=8KzpT2VNWE5OJEUS
+   ```
+   - O Docker Compose lê `DB_PASSWORD` do `.env`;
 
 3. Iniciar o banco de dados PostgreSQL via Docker Compose:
 ```bash
@@ -48,6 +52,20 @@ docker compose ps
 ```bash
 npm run start:dev
 ```
+
+### Armazenamento: memória ou banco de dados
+
+A API pode persistir usuários de duas formas, controladas pela variável `STORAGE_TYPE` no `.env`:
+
+| Valor       | Comportamento |
+|------------|----------------|
+| `database` | Usa PostgreSQL (padrão). Requer o banco rodando (ex.: `docker compose up -d`). |
+| `memory`   | Armazena usuários apenas na RAM. Não usa banco de dados; dados são perdidos ao reiniciar a aplicação. Útil para testes ou ambientes sem PostgreSQL. |
+
+- Para usar o banco: omita `STORAGE_TYPE` ou defina `STORAGE_TYPE=database`.
+- Para usar só memória: defina `STORAGE_TYPE=memory` e não é necessário subir o PostgreSQL.
+
+Em ambos os modos, a validação dos dados (DTOs e regras como “senha não pode conter o login”) é a mesma.
 
 ## Comandos Docker Úteis
 

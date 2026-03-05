@@ -1,90 +1,61 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdateUserDTO } from './dto/update-user.dto';
+import type { IUsersRepository } from './repositories/users.repository.interface';
+import { USERS_REPOSITORY } from './repositories/users.repository.interface';
 
 @Injectable()
 export class UsersService {
     constructor(
-        @InjectRepository(User)
-        private readonly userRepository: Repository<User>,
+        @Inject(USERS_REPOSITORY)
+        private readonly usersRepository: IUsersRepository,
     ) {}
 
     async getAllUsers(limit?: number, offset?: number): Promise<User[]> {
-        const query = this.userRepository.createQueryBuilder('user');
-        
-        if (limit) {
-            query.take(limit);
-        }
-        
-        if (offset) {
-            query.skip(offset);
-        }
-        
-        return await query.getMany();
+        return this.usersRepository.findAll(limit, offset);
     }
 
     async findOneUser(id: string): Promise<User> {
-        const user = await this.userRepository.findOne({
-            where: { id }
-        });
-        
+        const user = await this.usersRepository.findById(id);
+
         if (!user) {
             throw new HttpException('User not found', HttpStatus.NOT_FOUND);
         }
-        
+
         return user;
     }
 
     async createUser(createUserDTO: CreateUserDTO): Promise<User> {
-        const existingUserByEmail = await this.userRepository.findOne({
-            where: { email: createUserDTO.email }
-        });
-        
-        if (existingUserByEmail) {
+        const existingByEmail = await this.usersRepository.findByEmail(createUserDTO.email);
+        if (existingByEmail) {
             throw new HttpException('Email already registered', HttpStatus.CONFLICT);
         }
 
-        const existingUserByLogin = await this.userRepository.findOne({
-            where: { login: createUserDTO.login }
-        });
-        
-        if (existingUserByLogin) {
+        const existingByLogin = await this.usersRepository.findByLogin(createUserDTO.login);
+        if (existingByLogin) {
             throw new HttpException('Login already registered', HttpStatus.CONFLICT);
         }
-        
-        const newUser = this.userRepository.create({
-            ...createUserDTO,
-            active: true,
-        });
-        
-        return await this.userRepository.save(newUser);
+
+        return this.usersRepository.create(createUserDTO);
     }
 
     async updateUser(id: string, updateUserDTO: UpdateUserDTO): Promise<User> {
         const user = await this.findOneUser(id);
-        
+
         if (updateUserDTO.email && updateUserDTO.email !== user.email) {
-            const existingUser = await this.userRepository.findOne({
-                where: { email: updateUserDTO.email }
-            });
-            
-            if (existingUser) {
+            const existingByEmail = await this.usersRepository.findByEmail(updateUserDTO.email);
+            if (existingByEmail) {
                 throw new HttpException('Email already registered', HttpStatus.CONFLICT);
             }
         }
-        
-        Object.assign(user, updateUserDTO);
-        return await this.userRepository.save(user);
+
+        return this.usersRepository.update(id, updateUserDTO);
     }
 
     async deleteUser(id: string): Promise<{ message: string }> {
-        const user = await this.findOneUser(id);
-        
-        await this.userRepository.remove(user);
-        
+        await this.findOneUser(id);
+        await this.usersRepository.delete(id);
         return { message: 'User deleted successfully' };
     }
 }
