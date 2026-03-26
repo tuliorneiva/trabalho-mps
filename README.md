@@ -10,7 +10,7 @@ Trabalho desenvolvido para a disciplina de Métodos de Projeto de Software do cu
 - PostgreSQL
 - TypeScript
 
-# Estrutura do Projeto
+## Estrutura do Projeto
 
 O projeto consiste em uma API REST para gerenciamento de usuários com as seguintes funcionalidades:
 
