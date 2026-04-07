@@ -1,26 +1,44 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from "typeorm";
+import { TipoUsuario } from "../enums/tipo-usuario.enum";
 
-@Entity('users')
+@Entity("users")
 export class User {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
-    @Column({ type: 'varchar', length: 12, unique: true })
-    login: string;
+  @Column({ type: "varchar", length: 255 })
+  nomeCompleto: string;
 
-    @Column({ type: 'varchar', length: 255, unique: true })
-    email: string;
+  @Column({ type: "varchar", length: 255, unique: true })
+  email: string;
 
-    @Column({ type: 'varchar', length: 255 })
-    password: string;
+  @Column({ type: "varchar", length: 255 })
+  senha: string;
 
-    @Column({ type: 'boolean', default: true })
-    active: boolean;
+  @Column({ type: "enum", enum: TipoUsuario, default: TipoUsuario.ALUNO })
+  tipoUsuario: TipoUsuario;
 
-    @CreateDateColumn({ name: 'created_at' })
-    createdAt: Date;
+  @Column({ type: "varchar", length: 255, nullable: true })
+  curso: string;
 
-    @UpdateDateColumn({ name: 'updated_at' })
-    updatedAt: Date;
+  @Column({ type: "varchar", length: 50, nullable: true })
+  matricula: string;
+
+  @Column({ type: "boolean", default: true })
+  statusConta: boolean;
+
+  @Column({ type: "simple-array", nullable: true })
+  permissoes: string[];
+
+  @CreateDateColumn({ name: "created_at" })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: "updated_at" })
+  updatedAt: Date;
 }
-
