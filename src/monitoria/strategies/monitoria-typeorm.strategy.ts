@@ -8,7 +8,7 @@ import { IMonitoriaRepository } from './monitoria.repository.interface';
 export class MonitoriaTypeOrmRepository implements IMonitoriaRepository {
   constructor(
     @InjectRepository(Monitoria)
-    private readonly repo: Repository<Monitoria>,
+    readonly repo: Repository<Monitoria>,
   ) {}
 
   async findAll(): Promise<Monitoria[]> {

@@ -8,7 +8,7 @@ import { IUsersRepository } from "./users.repository.interface";
 export class UsersTypeOrmRepository implements IUsersRepository {
   constructor(
     @InjectRepository(User)
-    private readonly repo: Repository<User>,
+    readonly repo: Repository<User>,
   ) {}
 
   async findAll(limit?: number, offset?: number): Promise<User[]> {
