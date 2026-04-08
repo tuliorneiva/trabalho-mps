@@ -1,3 +1,5 @@
+import { NotificacaoBuilder } from '../notifications/notificacao.builder';
+
 export interface IObserver {
   update(agendamentoId: string, novoStatus: string): void;
 }
@@ -8,10 +10,21 @@ export interface ISubject {
   notifyObservers(agendamentoId: string, novoStatus: string): void;
 }
 
+/**
+ * Observer concreto que usa o NotificacaoBuilder para construir
+ * notificações ricas antes de enviá-las.
+ * Padrões: Observer (GoF) + Builder (GoF)
+ */
 export class NotificationObserver implements IObserver {
   update(agendamentoId: string, novoStatus: string): void {
-    console.log(
-      `[Notificação Observer] O status do Agendamento '${agendamentoId}' mudou para '${novoStatus}'. Notificando os usuários pelo celular ou email.`,
-    );
+    const notificacao = new NotificacaoBuilder()
+      .setTitulo('Status do Agendamento Atualizado')
+      .setCorpo(`O agendamento ${agendamentoId} mudou para: ${novoStatus}`)
+      .setDestinatario('sistema')
+      .setTipo('push')
+      .setAgendamento(agendamentoId)
+      .build();
+
+    console.log(`[Observer + Builder] Notificação criada: ${notificacao.toString()}`);
   }
 }
