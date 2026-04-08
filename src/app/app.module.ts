@@ -4,6 +4,8 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { UsersModule } from "../users/users.module";
+import { MonitoriaModule } from "../monitoria/monitoria.module";
+import { FacadeSingletonController } from "../common/facade-singleton.controller";
 
 const useMemory = process.env.STORAGE_TYPE === "memory";
 
@@ -25,8 +27,9 @@ const typeOrmModule = TypeOrmModule.forRoot({
     }),
     ...(useMemory ? [] : [typeOrmModule]),
     UsersModule,
+    MonitoriaModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, FacadeSingletonController],
   providers: [AppService],
 })
 export class AppModule {}
