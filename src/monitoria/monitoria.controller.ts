@@ -12,8 +12,6 @@ import { MonitoriaService } from './monitoria.service';
 import { CreateMonitoriaDTO } from './dto/create-monitoria.dto';
 import { UpdateMonitoriaDTO } from './dto/update-monitoria.dto';
 import { Monitoria } from './entities/monitoria.entity';
-import { HtmlReportTemplate } from './reports/html-report.template';
-import { PdfReportTemplate } from './reports/pdf-report.template';
 
 @Controller('monitoria')
 export class MonitoriaController {
@@ -22,18 +20,6 @@ export class MonitoriaController {
   @Get()
   findAll(): Promise<Monitoria[]> {
     return this.monitoriaService.findAll();
-  }
-
-  @Get('reports/html')
-  async getHtmlReport(): Promise<string> {
-    const data = await this.monitoriaService.findAll();
-    return new HtmlReportTemplate().generate(data);
-  }
-
-  @Get('reports/pdf')
-  async getPdfReport(): Promise<string> {
-    const data = await this.monitoriaService.findAll();
-    return new PdfReportTemplate().generate(data);
   }
 
   @Get(':id')

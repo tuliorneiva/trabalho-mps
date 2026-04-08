@@ -4,6 +4,14 @@ import { UsersService } from '../users/users.service';
 import { MonitoriaService } from '../monitoria/monitoria.service';
 import { User } from '../users/entities/user.entity';
 import { Monitoria } from '../monitoria/entities/monitoria.entity';
+import { TipoUsuario } from '../users/enums/tipo-usuario.enum';
+import { ObjetivoMonitoria } from '../monitoria/enums/objetivo-monitoria.enum';
+
+const makeUser = (tipo: TipoUsuario): User =>
+  Object.assign(new User(), { tipoUsuario: tipo });
+
+const makeMonitoria = (objetivo: ObjetivoMonitoria, materialApoio = false): Monitoria =>
+  Object.assign(new Monitoria(), { objetivo, materialApoio });
 
 describe('FacadeSingletonController (Facade + Singleton)', () => {
   let controller: FacadeSingletonController;
@@ -53,11 +61,10 @@ describe('FacadeSingletonController (Facade + Singleton)', () => {
   });
 
   it('getSystemStatistics deve retornar totalUsers e totalMonitorias', async () => {
-    usersService.getAllUsers.mockResolvedValue([new User(), new User()] as User[]);
+    usersService.getAllUsers.mockResolvedValue([new User(), new User()]);
     monitoriaService.count.mockResolvedValue(3);
 
     const stats = await controller.getSystemStatistics();
-
     expect(stats).toEqual({ totalUsers: 2, totalMonitorias: 3 });
   });
 
@@ -71,5 +78,29 @@ describe('FacadeSingletonController (Facade + Singleton)', () => {
     monitoriaService.findAll.mockResolvedValue([new Monitoria()]);
     const result = await controller.getAllMonitorias();
     expect(result).toHaveLength(1);
+  });
+
+  it('getHtmlReport deve retornar HTML com estatísticas de usuários', async () => {
+    usersService.getAllUsers.mockResolvedValue([
+      makeUser(TipoUsuario.ALUNO),
+      makeUser(TipoUsuario.MONITOR),
+    ]);
+    monitoriaService.findAll.mockResolvedValue([
+      makeMonitoria(ObjetivoMonitoria.REFORCO, true),
+    ]);
+
+    const html = await controller.getHtmlReport();
+    expect(html).toContain('<html>');
+    expect(html).toContain('Alunos');
+    expect(html).toContain('2');
+  });
+
+  it('getPdfReport deve retornar texto PDF simulado com estatísticas', async () => {
+    usersService.getAllUsers.mockResolvedValue([makeUser(TipoUsuario.ALUNO)]);
+    monitoriaService.findAll.mockResolvedValue([]);
+
+    const pdf = await controller.getPdfReport();
+    expect(pdf).toContain('PDF SIMULADO');
+    expect(pdf).toContain('Total de Usuários');
   });
 });

@@ -1,26 +1,33 @@
 import { ReportTemplate } from './report.template';
-import { Monitoria } from '../entities/monitoria.entity';
+import { SystemStats } from '../../common/system-stats.interface';
 
 export class PdfReportTemplate extends ReportTemplate {
   protected formatHeader(): string {
-    return '=== RELATÓRIO DE MONITORIAS (PDF SIMULADO) ===';
+    return '=== RELATÓRIO DE ESTATÍSTICAS — SOS UNIVERSITÁRIOS (PDF SIMULADO) ===';
   }
 
-  protected formatBody(data: Monitoria[]): string {
-    return data
-      .map(
-        (m) =>
-          `| ${m.idMonitoria} | ${m.titulo} | ${m.objetivo} | ` +
-          `Material: ${m.materialApoio ? 'Sim' : 'Não'} |`,
-      )
-      .join('\n');
+  protected formatBody(stats: SystemStats): string {
+    return (
+      '\n--- USUÁRIOS ---\n' +
+      `Total de Usuários   : ${stats.totalUsuarios}\n` +
+      `  Alunos            : ${stats.usuariosPorTipo.Aluno}\n` +
+      `  Monitores         : ${stats.usuariosPorTipo.Monitor}\n` +
+      `  Ambos             : ${stats.usuariosPorTipo.Ambos}\n` +
+      '\n--- MONITORIAS ---\n' +
+      `Total de Monitorias : ${stats.totalMonitorias}\n` +
+      `  Reforço           : ${stats.monitoriasPorObjetivo.Reforco}\n` +
+      `  Aprofundamento    : ${stats.monitoriasPorObjetivo.Aprofundamento}\n` +
+      `  Provas            : ${stats.monitoriasPorObjetivo.Provas}\n` +
+      `  Exercícios        : ${stats.monitoriasPorObjetivo.Exercicios}\n` +
+      `  Com Material      : ${stats.monitoriasComMaterial}\n`
+    );
   }
 
-  protected formatFooter(): string {
-    return `\n=== Gerado em: ${new Date().toISOString()} ===`;
+  protected formatFooter(dataGeracao: string): string {
+    return `=== Gerado em: ${dataGeracao} ===`;
   }
 
   protected buildOutput(header: string, body: string, footer: string): string {
-    return `${header}\n${body}${footer}`;
+    return `${header}${body}${footer}`;
   }
 }
