@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from '../users/users.module';
 import { MonitoriaModule } from '../monitoria/monitoria.module';
+import { AgendamentoModule } from '../agendamento/agendamento.module';
 import { FacadeSingletonController } from '../common/facade-singleton.controller';
 
 const useMemory = process.env.STORAGE_TYPE === 'memory';
@@ -26,6 +27,7 @@ const typeOrmModule = TypeOrmModule.forRoot({
     ...(useMemory ? [] : [typeOrmModule]),
     UsersModule,
     MonitoriaModule,
+    AgendamentoModule,
   ],
   controllers: [AppController, FacadeSingletonController],
   providers: [AppService],
